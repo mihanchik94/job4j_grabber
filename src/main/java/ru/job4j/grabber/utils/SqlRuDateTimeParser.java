@@ -7,6 +7,8 @@ import java.util.Map;
 import static java.util.Map.entry;
 
 public class SqlRuDateTimeParser implements DateTimeParser {
+    private static final String TODAY = "сегодня";
+    private static final String YESTERDAY = "вчера";
     private static final Map<String, Integer> MONTHS = Map.ofEntries(
             entry("янв", 1),
             entry("фев", 2),
@@ -29,9 +31,9 @@ public class SqlRuDateTimeParser implements DateTimeParser {
         String[] dateTime = parse.split(", ");
         String[] dateElements = dateTime[0].split(" ");
         String[] timeElements = dateTime[1].split(":");
-        if (parse.contains("сегодня")) {
+        if (parse.contains(TODAY)) {
             result = getDateTime(LocalDate.now(), timeElements);
-        } else if (parse.contains("вчера")) {
+        } else if (parse.contains(YESTERDAY)) {
             result = getDateTime(LocalDate.now().minusDays(1), timeElements);
         } else if (dateElements.length > 2) {
             result = getDateTime(LocalDate.of(2000 + Integer.parseInt(dateElements[2]),
@@ -52,9 +54,5 @@ public class SqlRuDateTimeParser implements DateTimeParser {
                         Integer.parseInt(time[1])
                 )
         );
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new SqlRuDateTimeParser().parse("2 дек 19, 22:29"));
     }
 }
