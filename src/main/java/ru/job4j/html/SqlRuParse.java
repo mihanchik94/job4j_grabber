@@ -8,7 +8,7 @@ import org.jsoup.select.Elements;
 
 public class SqlRuParse {
     public static void main(String[] args) throws Exception {
-        for(int page = 1; page <=5; page ++) {
+        for (int page = 1; page <= 5; page++) {
             Document doc = Jsoup.connect("https://www.sql.ru/forum/job-offers/" + page).get();
             Elements row = doc.select(".postslisttopic");
             for (Element td : row) {
