@@ -10,12 +10,7 @@ public class Post {
     private String description;
     private LocalDateTime created;
 
-    public Post(int id, String title, String link, String description, LocalDateTime created) {
-        this.id = id;
-        this.title = title;
-        this.link = link;
-        this.description = description;
-        this.created = created;
+    public Post() {
     }
 
     public Post(String title, String link, String description, LocalDateTime created) {
@@ -23,6 +18,16 @@ public class Post {
         this.link = link;
         this.description = description;
         this.created = created;
+    }
+
+    public static Post getPost(int id, String title, String link, String description, LocalDateTime created) {
+        Post post = new Post();
+        post.id = id;
+        post.title = title;
+        post.link = link;
+        post.description = description;
+        post.created = created;
+        return post;
     }
 
     public int getId() {
