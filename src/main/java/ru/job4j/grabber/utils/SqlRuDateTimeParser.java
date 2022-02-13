@@ -51,7 +51,7 @@ public class SqlRuDateTimeParser implements DateTimeParser {
                 date,
                 LocalTime.of(
                         Integer.parseInt(time[0]),
-                        Integer.parseInt(time[1])
+                        Integer.parseInt(time[1].trim())
                 )
         );
     }
