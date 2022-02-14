@@ -13,8 +13,8 @@ public class PostLoad {
         Document doc = Jsoup.connect(link).get();
         String titleArray = doc.select(".messageHeader").get(0).ownText();
         String description = doc.select(".msgBody").get(1).text();
-        String dateTime = doc.select(".msgFooter").get(0).text().substring(0, 16);
-        return Post.getPost(0, titleArray, link, description, parser.parse(dateTime));
+        String dateTime = doc.select(".msgFooter").get(0).text().replaceFirst("\\[.*".trim(), "");
+        return new Post(titleArray, link, description, parser.parse(dateTime));
     }
 
 
