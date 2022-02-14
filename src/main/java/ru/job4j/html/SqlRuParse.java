@@ -39,7 +39,7 @@ public class SqlRuParse implements Parse {
         Document doc = Jsoup.connect(link).get();
         String title = doc.select(".messageHeader").get(0).ownText();
         String description = doc.select(".msgBody").get(1).text();
-        String dateTime = doc.select(".msgFooter").get(0).text().substring(0, 16);
+        String dateTime = doc.select(".msgFooter").get(0).text().replaceFirst("\\[.*".trim(), "");
         return Post.getPost(0, title, link, description, dateTimeParser.parse(dateTime));
     }
 }
