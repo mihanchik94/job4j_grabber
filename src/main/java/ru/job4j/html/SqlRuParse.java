@@ -21,22 +21,37 @@ public class SqlRuParse implements Parse {
     }
 
     @Override
-    public List<Post> list(String link) throws IOException {
+    public List<Post> list(String link) {
         List<Post> posts = new ArrayList<>();
         for (int page = 1; page <= 5; page++) {
-            Document doc = Jsoup.connect(link + "/" + page).get();
+            Document doc = null;
+            try {
+                doc = Jsoup.connect(link + "/" + page).get();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            assert doc != null;
             Elements row = doc.select(".postslisttopic");
             for (Element td : row) {
                 Element href = td.child(0);
-                posts.add(detail(href.getAllElements().attr("href")));
+                if (href.text().toLowerCase().contains("java") &&
+                        !href.text().toLowerCase().contains("javascript")) {
+                    posts.add(detail(href.getAllElements().attr("href")));
+                }
             }
         }
         return posts;
     }
 
     @Override
-    public Post detail(String link) throws IOException {
-        Document doc = Jsoup.connect(link).get();
+    public Post detail(String link) {
+        Document doc = null;
+        try {
+            doc = Jsoup.connect(link).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assert doc != null;
         String title = doc.select(".messageHeader").get(0).ownText();
         String description = doc.select(".msgBody").get(1).text();
         String dateTime = doc.select(".msgFooter").get(0).text().replaceFirst("\\[.*".trim(), "");
