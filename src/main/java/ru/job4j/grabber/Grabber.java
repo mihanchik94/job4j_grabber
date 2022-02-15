@@ -7,6 +7,9 @@ import ru.job4j.html.SqlRuParse;
 import ru.job4j.model.Post;
 
 import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.Properties;
 
 import static org.quartz.JobBuilder.newJob;
@@ -26,10 +29,10 @@ public class Grabber implements Grab {
         return scheduler;
     }
 
-    public void cfg() throws FileNotFoundException {
-        try (InputStream inputStream = new FileInputStream(new File("app.properties"))) {
+    public void cfg() {
+        try (InputStream inputStream = Grabber.class.getClassLoader().getResourceAsStream("app.properties")) {
             cfg.load(inputStream);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -65,11 +68,34 @@ public class Grabber implements Grab {
         }
     }
 
+
+    public void web(Store store) {
+        new Thread(() -> {
+            try (ServerSocket server = new ServerSocket(Integer.parseInt(cfg.getProperty("port")))) {
+                while (!server.isClosed()) {
+                    Socket socket = server.accept();
+                    try (OutputStream outputStream = socket.getOutputStream()) {
+                        outputStream.write("HTTP/1.1 200 OK\r\n\r\n".getBytes());
+                        for (Post post : store.getAll()) {
+                            outputStream.write(post.toString().getBytes(Charset.forName("Windows-1251")));
+                            outputStream.write(System.lineSeparator().getBytes());
+                        }
+                    } catch (IOException io) {
+                        io.printStackTrace();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
     public static void main(String[] args) throws Exception {
         Grabber grabber = new Grabber();
         grabber.cfg();
         Scheduler scheduler = grabber.scheduler();
         Store store = grabber.store();
         grabber.init(new SqlRuParse(new SqlRuDateTimeParser()), store, scheduler);
+        grabber.web(store);
     }
 }
