@@ -102,13 +102,16 @@ public class PsqlStore implements Store, AutoCloseable {
         try (InputStream inputStream = PsqlStore.class.getClassLoader().getResourceAsStream("app.properties")) {
             Properties config = new Properties();
             config.load(inputStream);
-            PsqlStore store = new PsqlStore(config);
-            SqlRuParse parse = new SqlRuParse(new SqlRuDateTimeParser());
-            List<Post> posts = parse.list("https://www.sql.ru/forum/job-offers/");
-            posts.forEach(store::save);
-            store.getAll().forEach(System.out::println);
-        } catch (IOException | SQLException e) {
+            try (PsqlStore store = new PsqlStore(config)) {
+                SqlRuParse parse = new SqlRuParse(new SqlRuDateTimeParser());
+                List<Post> posts = parse.list("https://www.sql.ru/forum/job-offers/");
+                posts.forEach(store::save);
+                store.getAll().forEach(System.out::println);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 }
+
+
